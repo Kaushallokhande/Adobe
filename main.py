@@ -27,7 +27,6 @@ for f in os.listdir(in_dir):
         t2 = time.time()
         
         dur = t2 - t1
-
         
         print(f"→ Saved to {out_path}")
         print(f"⏱ Time taken: {dur:.2f} seconds")

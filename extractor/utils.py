@@ -5,7 +5,7 @@ def cluster_fonts(sizes):
     
     u = sorted(list(set(sizes)), reverse=True)
     arr = np.array(u).reshape(-1, 1)
-
+    
     
     if len(u) <= 3:
         return {round(s, 1): i + 1 for i, s in enumerate(u)}

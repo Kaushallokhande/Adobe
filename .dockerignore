@@ -23,6 +23,7 @@ Thumbs.db
 *.bak
 *.swp
 
+
 # Output folder
 output/
 

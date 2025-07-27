@@ -1,25 +1,33 @@
-import time
-from extractor.parser import process_pdf
 import os
+import json
+import time
+from extractor.parser import extract_outline
 
-input_dir = "input"
-output_dir = "output"
+in_dir = 'input'
 
-def main():
-    os.makedirs(output_dir, exist_ok=True)
+out_dir = 'output'
 
-    for filename in os.listdir(input_dir):
-        if filename.lower().endswith(".pdf"):
-            input_path = os.path.join(input_dir, filename)
-            output_path = os.path.join(output_dir, filename.replace(".pdf", ".json"))
+os.makedirs(out_dir, exist_ok=True)
 
-            print(f"\n⏳ Processing {filename}...")
-            start_time = time.time()
+for f in os.listdir(in_dir):
+    
+    if f.endswith('.pdf'):
+        
+        in_path = os.path.join(in_dir, f)
+        
+        out_path = os.path.join(out_dir, f.replace('.pdf', '.json'))
 
-            process_pdf(input_path, output_path)
+        t1 = time.time()
 
-            elapsed = time.time() - start_time
-            print(f"✅ Done in {elapsed:.2f} seconds\n")
+        data = extract_outline(in_path)
 
-if __name__ == "__main__":
-    main()
+        with open(out_path, 'w', encoding='utf-8') as out:
+            json.dump(data, out, indent=2, ensure_ascii=False)
+
+        t2 = time.time()
+        
+        dur = t2 - t1
+
+        
+        print(f"→ Saved to {out_path}")
+        print(f"⏱ Time taken: {dur:.2f} seconds")

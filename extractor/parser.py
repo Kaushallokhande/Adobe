@@ -1,56 +1,116 @@
-import fitz  # PyMuPDF
-import json
+import fitz
+from extractor.utils import cluster_fonts
+from langdetect import detect
 
-def process_pdf(pdf_path, output_path):
-    doc = fitz.open(pdf_path)
-    title = extract_title(doc)
 
-    headings = []
-    for page_number in range(doc.page_count):
-        page = doc.load_page(page_number)
-        blocks = page.get_text("dict")["blocks"]
+def find_title(blocks):
+    
+    blocks = sorted(blocks, key=lambda b: (-b["size"], b["y"]))
+    for b in blocks:
+        
+        if len(b["text"]) > 4 and b["y"] < 200:
+            return b["text"]
+    return "Untitled"
 
-        for block in blocks:
-            for line in block.get("lines", []):
-                for span in line.get("spans", []):
-                    text = span["text"].strip()
-                    size = span["size"]
-                    if is_heading(text):
-                        level = classify_heading(size)
-                        headings.append({
-                            "level": level,
-                            "text": text,
-                            "page": page_number + 1
-                        })
 
-    output = {
+def assign_heading_levels(blocks, sizes, lang="en"):
+    
+    clusters = cluster_fonts(sizes)
+    
+    out = []
+
+    for b in blocks:
+        
+        lvl = clusters.get(b["size"])
+       
+        if lvl not in [1, 2, 3]:
+            continue
+
+        if lang == "en":
+            if lvl == 3 and len(b["text"].strip()) < 4:
+                continue
+            if lvl in [1, 2] and len(b["text"].split()) > 15:
+                continue
+        else:
+            if b["y"] > 600:
+                continue
+            
+            if len(b["text"]) < 3:
+                continue
+           
+            if b["width"] < 50:
+                continue
+           
+            if b["size"] < 8.0:
+                continue
+
+        out.append({
+            "level": f"H{lvl}",
+            "text": b["text"],
+            "page": b["page"]
+        })
+
+    return out
+
+
+def extract_outline(path):
+    doc = fitz.open(path)
+   
+    blocks = []
+    
+    sizes = []
+    texts = []
+
+    for i in range(len(doc)):
+        pg = doc[i]
+        blks = pg.get_text("dict")["blocks"]
+
+        for blk in blks:
+            
+            for ln in blk.get("lines", []):
+                
+                for sp in ln.get("spans", []):
+                    txt = sp["text"].strip()
+                    if not txt:
+                        continue
+
+                    s = round(sp["size"], 1)
+                    f = sp.get("font", "").lower()
+                    bb = sp["bbox"]
+
+                    bold = (
+                        "bold" in f or
+                        "black" in f or
+                        "semibold" in f
+                    )
+
+                    blocks.append({
+                        "text": txt,
+                        "size": s,
+                        "font": f,
+                        "bold": bold,
+                        "page": i + 1,
+                        "y": bb[1],
+                        "x": bb[0],
+                        "width": bb[2] - bb[0]
+                    })
+
+                    sizes.append(s)
+                    texts.append(txt)
+
+    try:
+        lang = detect(" ".join(texts[:100]))
+    except:
+        lang = "en"
+
+    print(f"Detected Language: {lang}")
+
+    
+    title = find_title(blocks)
+   
+    outline = assign_heading_levels(blocks, sizes, lang=lang)
+
+    return {
         "title": title,
-        "outline": headings
+        "outline": outline
     }
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(output, f, indent=2, ensure_ascii=False)
-
-def extract_title(doc):
-    page = doc.load_page(0)
-    blocks = page.get_text("dict")["blocks"]
-    candidate = ""
-    max_size = 0
-    for block in blocks:
-        for line in block.get("lines", []):
-            for span in line.get("spans", []):
-                if span["size"] > max_size:
-                    candidate = span["text"].strip()
-                    max_size = span["size"]
-    return candidate
-
-def is_heading(text):
-    return len(text) > 2 and text[0].isupper()
-
-def classify_heading(size):
-    if size >= 20:
-        return "H1"
-    elif size >= 15:
-        return "H2"
-    else:
-        return "H3"

@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Output and intermediate files
+output/
+*.log
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# VSCode project settings
+.vscode/
+
+# Docker-related
+*.tar
+*.img
+*.pid
+
+# Environment variables
+.env
+
+# Mac system files
+.AppleDouble
+.LSOverride
+
+# Python metadata
+*.egg-info/
+dist/
+build/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Coverage/test reports
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.cache
+nosetests.xml
+test-results.xml
+

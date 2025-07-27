@@ -1,0 +1,31 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Jupyter and Python notebooks
+*.ipynb
+
+# Mac and Windows junk
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+*.env
+
+# Git
+.git
+.gitignore
+
+# OS files
+*.log
+*.bak
+*.swp
+
+# Output folder
+output/
+
+# PDFs or large inputs
+*.pdf
+input/

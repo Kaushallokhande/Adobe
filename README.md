@@ -27,6 +27,7 @@ pdf-outline-extractor/
 │   └── utils.py      # clustering helpers
 ├── main.py        # script to run the thing
 ├── requirements.txt
+├── Dockerfile           # Docker container configuration
 └── README.md      # you're here :)
 
 ````
@@ -135,8 +136,8 @@ H3: Supervised Learning
 ##  Docker?
 
 ```bash
-docker build -t pdf-grabber .
-docker run -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output pdf-grabber
+docker build -t adobe_1A .
+docker run -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output adobe_1A
 ```
 
 ---

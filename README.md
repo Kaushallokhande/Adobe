@@ -1,4 +1,4 @@
-#  PDF Grabber (aka Outline Thingy)
+#  PDF Grabber (PDF Processing Solution)
 
 Quick and dirty tool to pull out the title + headings (H1, H2, H3) from any PDF — offline, fast, and works with weird fonts.
 
@@ -45,7 +45,7 @@ pdf-outline-extractor/
 ### 1. Clone it
 
 ```bash
-git clone https://github.com/Kaushallokhande/Adobe_R1A.git
+git clone https://github.com/Kaushallokhande/Adobe_1A.git
 cd pdf-outline-extractor
 ````
 
@@ -134,7 +134,10 @@ H3: Supervised Learning
 
 ##  Docker?
 
-Yup, Dockerfile included. Run it anywhere. Setup docs coming soon.
+```bash
+docker build -t pdf-grabber .
+docker run -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output pdf-grabber
+```
 
 ---
 
